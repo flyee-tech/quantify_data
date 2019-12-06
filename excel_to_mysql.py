@@ -1,16 +1,10 @@
-import configparser as cp
 import json
 
 import pandas as pd
-import pymysql
 
-config = cp.ConfigParser()
-config.read('../conf/mysql.conf')
-host = config.get('mysql', 'host')
-port = config.get('mysql', 'port')
-user = config.get('mysql', 'user')
-passwd = config.get('mysql', 'passwd')
-conn = pymysql.connect(host=host, port=port, user=user, passwd=passwd, db='quantify_data')
+import mysql_conn
+
+conn = mysql_conn.conn()
 
 
 def df_insert_to_mysql(conn, df, table_name=None):
