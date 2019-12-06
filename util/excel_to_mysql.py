@@ -5,7 +5,7 @@ import pandas as pd
 import pymysql
 
 config = cp.ConfigParser()
-config.read('./mysql.conf')
+config.read('../conf/mysql.conf')
 host = config.get('mysql', 'host')
 port = config.get('mysql', 'port')
 user = config.get('mysql', 'user')
