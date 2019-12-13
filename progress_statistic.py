@@ -2,19 +2,26 @@
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
 import pandas as pd
+
 import mysql_conn
 
 
-def resetColor(b):
-    w = b.get_width()
-    if w < 100:
-        b.set_color(r'#76C7DB')
-    if 100 <= w < 200:
-        b.set_color(r'#AA6ED0')
-    if 200 <= w < 300:
-        b.set_color(r'#DF29D3')
-    if w >= 300:
-        b.set_color(r'#CAAE7C')
+def countColor(is_deprecated, progress):
+    if is_deprecated == 0:
+        return r'#CCD1D1'
+    if progress < 100:
+        return r'#76C7DB'
+    if 100 <= progress < 200:
+        return r'#AA6ED0'
+    if 200 <= progress < 300:
+        return r'#DF29D3'
+    if progress >= 300:
+        return r'#CAAE7C'
+
+
+def setColor(df):
+    df.loc[:, 'color'] = df.apply(lambda x: countColor(x.is_deprecated, x.progress), axis=1)
+    return list(df['color'])
 
 
 def resetWidth(b):
@@ -32,6 +39,7 @@ conn = mysql_conn.conn()
 sql = '''
     SELECT CONCAT(s.belong, ':', s.name) AS name,
            s.`total`,
+           s.`is_deprecated`,
            cc.number,
            cc.times
     FROM subject AS s
@@ -51,10 +59,11 @@ df.loc[:, 'progress'] = df.apply(lambda x: (x.number * x.times / x.total * 100),
 
 y = list(df['name'])
 width = list(df['progress'])
-plt.figure(num=1, figsize=(8, 2))
-bar_list = plt.barh(y, width, height=0.7, color='b')
+colors = setColor(df)
+plt.figure(num=1, figsize=(12, 6))
+# bar_list = plt.barh(y, width, height=0.7, color='b')
+bar_list = plt.barh(y, width, height=0.7, color=colors)
 for bar in bar_list:
-    resetColor(bar)
     resetWidth(bar)
     plt.text(bar.get_width() + 1,
              bar.get_y() + 0.3,
